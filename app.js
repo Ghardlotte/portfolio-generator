@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+const generatePage = require('./src/page-template.js');
 const inquirer = require('inquirer');
 
   const promptUser = () => {
@@ -29,9 +32,22 @@ const inquirer = require('inquirer');
         }
       },
       {
+        type: 'confirm',
+        name: 'confirmAbout',
+        message: 'Would you like to enter some information about yourself for an "About" section?',
+        default: true
+      },
+      {
         type: 'input',
         name: 'about',
-        message: 'Provide some information about yourself:' 
+        message: 'Provide some information about yourself:', 
+        when: ({ confirmAbout }) => {
+          if (confirmAbout) {
+            return true;
+          } else {
+            return false;
+          }
+        }
       }
     ]);
   };
@@ -114,13 +130,17 @@ const inquirer = require('inquirer');
   promptUser()
   .then(promptProject)
   .then(portfolioData => {
-    console.log(portfolioData)
+     const pageHTML = generatePage(portfolioData);
+
+    fs.writeFile('./index.html', pageHTML, err => {
+      if (err) throw new Error(err);
+
+      console.log('Page created! Check out index.html in this directory to see it!');
+    });
   });
   
 
-// const fs = require('fs');
 
-// const generatePage = require('./src/page-template.js');
 
 // const [name, github] = profileDataArgs;
 
